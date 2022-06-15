@@ -6,7 +6,7 @@ import {
 
 export type RootStackParamList = {
     Gallery: undefined;
-    Album: undefined;
+    Album: { albumId: number };
 };
 
 export type NavigationProps<
