@@ -1,18 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect } from 'react';
+import { View, FlatList, ActivityIndicator, ListRenderItemInfo } from 'react-native';
 import Copyright from '../components/Copyright';
-import { NavigationProps } from '../navigation'
+import { NavigationProps, } from '../navigation'
+import { getAlbumList, setAlbumsList } from '../redux/gallerySlice';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { api } from '../services/api'
 import { Album } from '../types/api.type'
+import AlbumItem from '../components/AlbumItem'
 
 type Props = NavigationProps<'Gallery'>;
 function HomeScreen({ navigation }: Props) {
-    const [albums, setAlbums] = useState<Album[]>([])
 
-    const loadAlbums = async () => {
-        const response = await api.get('/albums')
-        setAlbums(response.data)
-    }
+    const dispatch = useAppDispatch()
+
+    const loadAlbums = useCallback(async () => {
+        const response = await api.get<Album[]>('/albums')
+        dispatch(setAlbumsList(response.data))
+    }, [])
+
+    const albums = useAppSelector(getAlbumList)
 
     useEffect(() => {
         loadAlbums()
@@ -31,27 +37,20 @@ function HomeScreen({ navigation }: Props) {
                 initialNumToRender={10}
                 scrollEventThrottle={16}
                 showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ alignItems: 'center'}}
-                renderItem={({ item }) => {
-                    return (
-                        <TouchableOpacity
-                            style={{ width: 250, height: 250, borderWidth: 1, margin: 10 }}
-                            onPress={() => navigation.navigate('Album', { albumId: item.id })}
-                        >
-                            <Text> {item.title} </Text>
-                        </TouchableOpacity>
-                    )
-                }}
+                ListEmptyComponent={listEmptyComponent}
+                renderItem={renderItem}
             />
             <Copyright />
-            {/* <Text>Home Screen</Text>
-            <Button
-                title="Go to Album"
-                onPress={() => navigation.navigate('Album')}
-            /> */}
         </View>
     );
 }
 
+const listEmptyComponent = () => {
+    return <ActivityIndicator size='large' />
+}
+
+const renderItem = ({ item }: ListRenderItemInfo<Album>) => {
+    return <AlbumItem item={item} />
+}
 
 export default HomeScreen;
