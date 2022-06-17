@@ -1,12 +1,10 @@
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useCallback, useEffect } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { RootStackParamList } from '../navigation'
-import { getAlbumPhotosById, setAlbumPhotos } from '../redux/gallerySlice';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { getPhotosByAlbum } from '../services/api';
+import { useGetAlbumPhotosByIdQuery } from '../services/galleryApi';
 import { Album } from '../types/api.type';
 
 interface Props {
@@ -15,43 +13,44 @@ interface Props {
 
 function AlbumItem({ item }: Props) {
 
-    const dispatch = useAppDispatch()
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
     const albumId = item.id
-    const photos = useAppSelector(state => getAlbumPhotosById(state, albumId)) || []
+    const { data, error, isLoading, isError, isFetching } = useGetAlbumPhotosByIdQuery(albumId)
 
-    const loadPhotos = useCallback(async () => {
-        getPhotosByAlbum(albumId).then(response => {
-            dispatch(setAlbumPhotos({ id: albumId, photos: response.data }))
-        }).catch((e) => {
-            console.log('Error on loading photos', e)
-        })
-    }, [])
 
-    useEffect(() => {
-        if (photos.length === 0) {
-            loadPhotos()
-        }
-    }, [])
+    if (isLoading || isFetching) {
+        <ActivityIndicator size='large' />
+    }
+
+    if (!data) return null
+
 
     return (
         <TouchableOpacity
             style={{ maxWidth: 200, margin: 10 }}
             onPress={() => navigation.navigate('Album', { albumId: item.id })}
+            disabled={isError}
         >
             <View style={{ width: 200, height: 200 }}>
-                {photos.length > 0 && <FastImage
+                {error && (
+                    <View style={{
+                        width: 200,
+                        height: 200,
+                        borderWidth: 1,
+                        borderColor: '#000',
+                    }}>
+                        <Text style={{ color: '#000' }}>Could not load the album</Text>
+                    </View>
+                )}
+                {data.length > 0 && <FastImage
                     key={item.id}
                     style={{
                         width: 200,
                         height: 200,
-                        borderWidth: 1,
-                        borderColor: '#fff',
-
                     }}
                     source={{
-                        uri: photos[0].thumbnailUrl,
+                        uri: data[0].thumbnailUrl,
                         headers: { 'User-Agent': 'GalleryApp' },
                     }}
                     resizeMode="cover"
@@ -62,7 +61,7 @@ function AlbumItem({ item }: Props) {
                     <Text numberOfLines={2} style={{ fontSize: 16, color: '#000' }}>{item.title} </Text>
                 </View>
                 <View style={{ flex: 2, alignItems: 'flex-end' }}>
-                    <Text style={{ opacity: 0.4, fontSize: 16, color: '#000' }}>{photos.length}</Text>
+                    <Text style={{ opacity: 0.4, fontSize: 16, color: '#000' }}>{data.length}</Text>
                 </View>
             </View>
         </TouchableOpacity>
