@@ -1,10 +1,12 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import {
-    View, FlatList, Dimensions, Modal, ActivityIndicator, Text,
+    FlatList, Modal, ActivityIndicator,
     ListRenderItemInfo, RefreshControl,
 } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer'
 import FastImage from 'react-native-fast-image'
+import { View, Text } from '../../components/Themed'
+import layout from '../../constants/Layout'
 import ImageItem from './ImageItem'
 import ImageViewerHeader from './ImageViewerHeader'
 import ImageViewerLoadingIndicator from '../../components/LoadingIndicator'
@@ -15,7 +17,7 @@ import { useGetAlbumPhotosByIdQuery } from '../../services/galleryApi';
 import RetryButon from '../../components/RetryButon';
 
 
-const { width: screenWidth, } = Dimensions.get('screen')
+const { width: screenWidth, } = layout.window
 const IMG_PER_ROW = 3
 
 function AlbumScreen({ route }: NavigationProps<'Album'>) {
@@ -60,12 +62,11 @@ function AlbumScreen({ route }: NavigationProps<'Album'>) {
     if (error) {
         return (
             <View>
-                <Text style={{ color: '#000' }}>Could not get the album photos</Text>
+                <Text>Could not get the album photos</Text>
                 <RetryButon onPress={refetch} />
             </View>
         )
     }
-
 
 
     return (
@@ -120,19 +121,6 @@ const listEmptyComponent = () => {
             alignItems: 'center'
         }}>
             <Text style={{ marginTop: 8 }}>Album has no photos</Text>
-        </View>
-    )
-}
-
-const Loading = () => {
-    return (
-        <View style={{
-            marginVertical: 32,
-            flex: 1,
-            alignItems: 'center'
-        }}>
-            <ActivityIndicator size='large' />
-            <Text style={{ marginTop: 8 }}>Loading...</Text>
         </View>
     )
 }

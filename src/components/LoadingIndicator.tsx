@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text } from './Themed';
 
 const LoadingIndicator = () => <Text style={{ color: 'white' }} >Loading..</Text>
 

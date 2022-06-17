@@ -1,7 +1,8 @@
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, TouchableOpacity } from 'react-native';
+import { Text, View } from './Themed'
 import FastImage from 'react-native-fast-image';
 import { RootStackParamList } from '../navigation'
 import { useGetAlbumPhotosByIdQuery } from '../services/galleryApi';
@@ -40,7 +41,7 @@ function AlbumItem({ item }: Props) {
                         borderWidth: 1,
                         borderColor: '#000',
                     }}>
-                        <Text style={{ color: '#000' }}>Could not load the album</Text>
+                        <Text>Could not load the album</Text>
                     </View>
                 )}
                 {data.length > 0 && <FastImage
@@ -58,10 +59,10 @@ function AlbumItem({ item }: Props) {
             </View>
             <View style={{ flexDirection: 'row', }}>
                 <View style={{ flex: 8, marginRight: 4 }}>
-                    <Text numberOfLines={2} style={{ fontSize: 16, color: '#000' }}>{item.title} </Text>
+                    <Text numberOfLines={2} style={{ fontSize: 16 }}>{item.title} </Text>
                 </View>
                 <View style={{ flex: 2, alignItems: 'flex-end' }}>
-                    <Text style={{ opacity: 0.4, fontSize: 16, color: '#000' }}>{data.length}</Text>
+                    <Text style={{ opacity: 0.4, fontSize: 16 }}>{data.length}</Text>
                 </View>
             </View>
         </TouchableOpacity>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View } from './Themed';
 
 
 export default function Copyright() {
@@ -12,7 +12,7 @@ export default function Copyright() {
             padding: 4,
             marginTop: 16,
         }}>
-            <Text style={{ color: '#000' }}>&copy; Sandu Luca</Text>
+            <Text >&copy; Sandu Luca</Text>
         </View>
     );
 }

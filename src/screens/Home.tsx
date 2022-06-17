@@ -1,8 +1,9 @@
 import React from 'react';
 import {
-    View, FlatList, ActivityIndicator,
-    ListRenderItemInfo, RefreshControl, Text
+    FlatList, ActivityIndicator,
+    ListRenderItemInfo, RefreshControl
 } from 'react-native';
+import { Text, View } from '../components/Themed'
 import Copyright from '../components/Copyright';
 import { NavigationProps, } from '../navigation'
 import { Album } from '../types/api.type'
@@ -23,8 +24,12 @@ function HomeScreen({ navigation }: Props) {
 
     if (error) {
         return (
-            <View>
-                <Text style={{ color: '#000' }}>Could not get the albums</Text>
+            <View style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}>
+                <Text>Could not get the albums</Text>
                 <RetryButon onPress={refetch} />
             </View>
         )
@@ -35,7 +40,6 @@ function HomeScreen({ navigation }: Props) {
             flex: 1,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#fff',
         }}>
             <FlatList<Album>
                 data={data}
