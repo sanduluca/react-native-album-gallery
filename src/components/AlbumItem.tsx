@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
-import { ActivityIndicator, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View } from './Themed'
 import FastImage from 'react-native-fast-image';
 import { RootStackParamList } from '../navigation'
@@ -29,27 +29,24 @@ function AlbumItem({ item }: Props) {
 
     return (
         <TouchableOpacity
-            style={{ maxWidth: 200, margin: 10 }}
+            style={styles.touchable}
             onPress={() => navigation.navigate('Album', { albumId: item.id })}
             disabled={isError}
         >
-            <View style={{ width: 200, height: 200 }}>
+            <View>
+
                 {error && (
-                    <View style={{
-                        width: 200,
-                        height: 200,
+                    <View style={[styles.imageContainerSize, {
                         borderWidth: 1,
                         borderColor: '#000',
-                    }}>
+                    }]}>
                         <Text>Could not load the album</Text>
                     </View>
                 )}
+
                 {data.length > 0 && <FastImage
                     key={item.id}
-                    style={{
-                        width: 200,
-                        height: 200,
-                    }}
+                    style={styles.imageContainerSize}
                     source={{
                         uri: data[0].thumbnailUrl,
                         headers: { 'User-Agent': 'GalleryApp' },
@@ -57,17 +54,40 @@ function AlbumItem({ item }: Props) {
                     resizeMode="cover"
                 />}
             </View>
-            <View style={{ flexDirection: 'row', }}>
-                <View style={{ flex: 8, marginRight: 4 }}>
-                    <Text numberOfLines={2} style={{ fontSize: 16 }}>{item.title} </Text>
+
+            <View style={styles.titleAndTotalImgContainer}>
+                <View style={styles.albumTitleContainer}>
+                    <Text numberOfLines={2} style={styles.text}>{item.title} </Text>
                 </View>
                 <View style={{ flex: 2, alignItems: 'flex-end' }}>
-                    <Text style={{ opacity: 0.4, fontSize: 16 }}>{data.length}</Text>
+                    <Text style={[styles.text, { opacity: 0.4 }]}>{data.length}</Text>
                 </View>
             </View>
+
         </TouchableOpacity>
     )
 }
 
 
 export default AlbumItem;
+
+const styles = StyleSheet.create({
+    albumTitleContainer: {
+        flex: 8,
+        marginRight: 4,
+    },
+    titleAndTotalImgContainer: {
+        flexDirection: 'row',
+    },
+    text: {
+        fontSize: 16
+    },
+    imageContainerSize: {
+        width: 200,
+        height: 200,
+    },
+    touchable: {
+        maxWidth: 200,
+        margin: 10
+    },
+})

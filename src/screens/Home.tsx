@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     FlatList, ActivityIndicator,
-    ListRenderItemInfo, RefreshControl
+    ListRenderItemInfo, RefreshControl, StyleSheet
 } from 'react-native';
 import { Text, View } from '../components/Themed'
 import Copyright from '../components/Copyright';
@@ -24,11 +24,7 @@ function HomeScreen({ navigation }: Props) {
 
     if (error) {
         return (
-            <View style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-            }}>
+            <View style={styles.container}>
                 <Text>Could not get the albums</Text>
                 <RetryButon onPress={refetch} />
             </View>
@@ -36,11 +32,7 @@ function HomeScreen({ navigation }: Props) {
     }
 
     return (
-        <View style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-        }}>
+        <View style={styles.container}>
             <FlatList<Album>
                 data={data}
                 horizontal
@@ -70,5 +62,13 @@ const listEmptyComponent = () => {
 const renderItem = ({ item }: ListRenderItemInfo<Album>) => {
     return <AlbumItem item={item} />
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+})
 
 export default HomeScreen;

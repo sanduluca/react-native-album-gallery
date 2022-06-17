@@ -70,7 +70,7 @@ function AlbumScreen({ route }: NavigationProps<'Album'>) {
 
 
     return (
-        <View style={{}}>
+        <View>
             <FlatList<Photo>
                 data={data}
                 initialNumToRender={10}
