@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect } from 'react';
-import { View, FlatList, ActivityIndicator, ListRenderItemInfo } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, FlatList, ActivityIndicator, ListRenderItemInfo, RefreshControl } from 'react-native';
 import Copyright from '../components/Copyright';
 import { NavigationProps, } from '../navigation'
 import { getAlbumList, setAlbumsList } from '../redux/gallerySlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { api } from '../services/api'
+import { getAlbums } from '../services/api'
 import { Album } from '../types/api.type'
 import AlbumItem from '../components/AlbumItem'
 
@@ -12,13 +12,25 @@ type Props = NavigationProps<'Gallery'>;
 function HomeScreen({ navigation }: Props) {
 
     const dispatch = useAppDispatch()
+    const [refreshing, setRefreshing] = useState(false)
 
     const loadAlbums = useCallback(async () => {
-        const response = await api.get<Album[]>('/albums')
-        dispatch(setAlbumsList(response.data))
+        getAlbums()
+            .then(response => {
+                dispatch(setAlbumsList(response.data))
+            }).catch(() => {
+                console.log('Got error on loading albums')
+            })
     }, [])
 
     const albums = useAppSelector(getAlbumList)
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true)
+        loadAlbums().finally(() => {
+            setRefreshing(false)
+        })
+    }, [])
 
     useEffect(() => {
         loadAlbums()
@@ -39,6 +51,14 @@ function HomeScreen({ navigation }: Props) {
                 showsHorizontalScrollIndicator={false}
                 ListEmptyComponent={listEmptyComponent}
                 renderItem={renderItem}
+                refreshControl={
+                    <RefreshControl
+                        colors={["#7D4D8F", "#019592", "#FF7B16"]}
+                        tintColor={"#DFDFE0"}
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
             />
             <Copyright />
         </View>

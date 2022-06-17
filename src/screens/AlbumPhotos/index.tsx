@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import {
-    View, FlatList, Dimensions, Modal, ActivityIndicator, Text, ListRenderItemInfo,
+    View, FlatList, Dimensions, Modal, ActivityIndicator, Text, ListRenderItemInfo, RefreshControl,
 } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer'
 import FastImage from 'react-native-fast-image'
@@ -10,8 +10,9 @@ import ImageViewerLoadingIndicator from '../../components/LoadingIndicator'
 import { NavigationProps } from '../../navigation'
 import { Photo } from '../../types/api.type';
 import Copyright from '../../components/Copyright';
-import { useAppSelector } from '../../redux/hooks';
-import { getAlbumPhotosById } from '../../redux/gallerySlice';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { getAlbumPhotosById, setAlbumPhotos } from '../../redux/gallerySlice';
+import { getPhotosByAlbum } from '../../services/api';
 
 
 const { width: screenWidth, } = Dimensions.get('screen')
@@ -19,6 +20,9 @@ const IMG_PER_ROW = 3
 
 function AlbumScreen({ route }: NavigationProps<'Album'>) {
     const { albumId } = route.params
+
+    const dispatch = useAppDispatch()
+    const [refreshing, setRefreshing] = useState(false)
 
     const photos = useAppSelector(state => getAlbumPhotosById(state, albumId))
 
@@ -50,8 +54,24 @@ function AlbumScreen({ route }: NavigationProps<'Album'>) {
             />
         )
     }, [])
-    if(!photos){
-        return loading()
+
+    const loadPhotos = useCallback(async () => {
+        getPhotosByAlbum(albumId).then(response => {
+            dispatch(setAlbumPhotos({ id: albumId, photos: response.data }))
+        }).catch((e) => {
+            console.log('Error on loading photos', e)
+        })
+    }, [])
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true)
+        loadPhotos().finally(() => {
+            setRefreshing(false)
+        })
+    }, [])
+
+    if (!photos) {
+        return <Loading />
     }
 
     return (
@@ -65,6 +85,14 @@ function AlbumScreen({ route }: NavigationProps<'Album'>) {
                 renderItem={renderItem}
                 ListEmptyComponent={listEmptyComponent}
                 ListFooterComponent={Copyright}
+                refreshControl={
+                    <RefreshControl
+                        colors={["#7D4D8F", "#019592", "#FF7B16"]}
+                        tintColor={"#DFDFE0"}
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
             />
             <Modal visible={activePhoto !== null} onRequestClose={hideImageViewer}>
                 <ImageViewer
@@ -101,7 +129,8 @@ const listEmptyComponent = () => {
         </View>
     )
 }
-const loading = () => {
+
+const Loading = () => {
     return (
         <View style={{
             marginVertical: 32,

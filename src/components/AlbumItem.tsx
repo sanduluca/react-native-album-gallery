@@ -6,8 +6,8 @@ import FastImage from 'react-native-fast-image';
 import { RootStackParamList } from '../navigation'
 import { getAlbumPhotosById, setAlbumPhotos } from '../redux/gallerySlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { api } from '../services/api';
-import { Album, Photo } from '../types/api.type';
+import { getPhotosByAlbum } from '../services/api';
+import { Album } from '../types/api.type';
 
 interface Props {
     item: Album
@@ -22,7 +22,7 @@ function AlbumItem({ item }: Props) {
     const photos = useAppSelector(state => getAlbumPhotosById(state, albumId)) || []
 
     const loadPhotos = useCallback(async () => {
-        api.get<Photo[]>(`/photos?albumId=${albumId}`).then(response => {
+        getPhotosByAlbum(albumId).then(response => {
             dispatch(setAlbumPhotos({ id: albumId, photos: response.data }))
         }).catch((e) => {
             console.log('Error on loading photos', e)
