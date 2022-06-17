@@ -10,9 +10,9 @@ export default function Copyright() {
             alignItems: 'center',
             justifyContent: 'flex-end',
             padding: 4,
-            marginTop: 16
+            marginTop: 16,
         }}>
-            <Text>&copy; Sandu Luca</Text>
+            <Text style={{ color: '#000' }}>&copy; Sandu Luca</Text>
         </View>
     );
 }
